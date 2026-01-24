@@ -2,7 +2,8 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
-
+import { authMiddleware } from './middlewares/auth.middleware';
+import { checkRole } from './middlewares/role.middleware';
 dotenv.config();
 
 const app: Express = express();
@@ -26,6 +27,21 @@ app.get('/health', (req: Request, res: Response) => {
 // Rota Raiz
 app.get('/', (req: Request, res: Response) => {
   res.send('API do SecureAccess Hub está rodando!');
+});
+
+// Rota de autenticação
+app.get('/auth/me', authMiddleware, (req: Request, res: Response) => {
+  res.json({
+    message: 'Você está autenticado!',
+    user: req.user, // Retorna os dados do token decodificado
+  });
+});
+
+app.get('/secure/admin', authMiddleware, checkRole(['ADMIN']), (req: Request, res: Response) => {
+  res.json({
+    message: 'Bem-vindo à área administrativa!',
+    secretData: 'Dados sensíveis que apenas admins podem ver',
+  });
 });
 
 // Inicialização do Servidor
