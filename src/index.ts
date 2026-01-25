@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { authMiddleware } from './middlewares/auth.middleware';
 import { checkRole } from './middlewares/role.middleware';
 import { AppDataSource } from './config/data-source';
+import userRoutes from './routes/user.routes';
 import 'reflect-metadata';
 
 dotenv.config();
@@ -24,6 +25,9 @@ app.use(helmet()); // Adiciona headers de segurança HTTP (proteção contra XSS
 app.use(cors()); // Permite que outros domínios (ex: frontend React) acessem esta API
 app.use(express.json()); // Permite que a API entenda requisições com corpo em JSON
 app.use(express.urlencoded({ extended: true })); // Permite entender dados de formulários (URL encoded)
+
+// Rotas da API
+app.use('/users', userRoutes);
 
 // Rota de Health Check
 app.get('/health', (req: Request, res: Response) => {
