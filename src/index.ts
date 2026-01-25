@@ -4,14 +4,24 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { authMiddleware } from './middlewares/auth.middleware';
 import { checkRole } from './middlewares/role.middleware';
+import { AppDataSource } from './config/data-source';
+import 'reflect-metadata';
+
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
+// Inicializa a conexão com o banco de dados
+AppDataSource.initialize()
+  .then(() => {
+    console.log('[banco de dados]: Conexão com o banco de dados estabelecida com sucesso!');
+  })
+  .catch((error) => console.log(error));
+
 // Middlewares de Segurança e Parse
 app.use(helmet()); // Adiciona headers de segurança HTTP (proteção contra XSS, clickjacking, etc)
-app.use(cors()); // Permite que outros domínios (ex: seu frontend React) acessem esta API
+app.use(cors()); // Permite que outros domínios (ex: frontend React) acessem esta API
 app.use(express.json()); // Permite que a API entenda requisições com corpo em JSON
 app.use(express.urlencoded({ extended: true })); // Permite entender dados de formulários (URL encoded)
 
