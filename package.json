@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "O SecureAccess Hub é um sistema robusto de gerenciamento de acesso construído com Node.js, projetado para demonstrar segurança de nível empresarial, escalabilidade e padrões arquiteturais modernos. Ele apresenta uma API backend segura, controle de acesso baseado em função (RBAC) via Keycloak e um frontend React responsivo.",
   "main": "index.js",
-  "directories": {
-    "test": "tests"
-  },
+  "directories": {},
   "scripts": {
     "build": "rimraf dist && tsc",
     "start": "node dist/index.js",
@@ -53,6 +51,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
     "express-session": "^1.19.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
