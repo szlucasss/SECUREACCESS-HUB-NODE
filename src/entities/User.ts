@@ -1,13 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Index() // Índice para buscas rápidas por ID do Keycloak (login)
   @Column({ unique: true })
-  keycloakId: string; // ID único do usuário no Keycloak (campo 'sub' do token)
+  keycloakId: string;
 
+  @Index() // Índice para buscas rápidas por email (login/cadastro)
   @Column({ unique: true })
   email: string;
 
@@ -20,4 +22,3 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 }
-

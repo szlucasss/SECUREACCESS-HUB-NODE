@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { authMiddleware } from './middlewares/auth.middleware';
 import { checkRole } from './middlewares/role.middleware';
 import { limiter } from './middlewares/rateLimit.middleware';
+import { requestLogger } from './middlewares/logger.middleware';
 import { AppDataSource } from './config/data-source';
 import userRoutes from './routes/user.routes';
 import 'reflect-metadata';
@@ -25,19 +26,50 @@ AppDataSource.initialize()
 app.use(helmet()); // Adiciona headers de segurança HTTP (proteção contra XSS, clickjacking, etc)
 app.use(cors()); // Permite que outros domínios (ex: frontend React) acessem esta API
 app.use(limiter); // Aplica rate limiting em todas as rotas
+app.use(requestLogger); // Logs estruturados com Correlation ID
 app.use(express.json()); // Permite que a API entenda requisições com corpo em JSON
 app.use(express.urlencoded({ extended: true })); // Permite entender dados de formulários (URL encoded)
 
 // Rotas da API
 app.use('/users', userRoutes);
 
-// Rota de Health Check
-app.get('/health', (req: Request, res: Response) => {
-  res.status(200).json({
+import { redis } from './config/redis';
+
+// Rota de Health Check Detalhado
+app.get('/health', async (req: Request, res: Response) => {
+  const healthcheck = {
     status: 'UP',
     timestamp: new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
     uptime: process.uptime(),
-  });
+    services: {
+      database: 'UNKNOWN',
+      redis: 'UNKNOWN',
+    },
+  };
+
+  try {
+    // Verifica Banco de Dados
+    if (AppDataSource.isInitialized) {
+      healthcheck.services.database = 'UP';
+    } else {
+      healthcheck.services.database = 'DOWN';
+      healthcheck.status = 'DOWN';
+    }
+
+    // Verifica Redis
+    if (redis.status === 'ready') {
+      healthcheck.services.redis = 'UP';
+    } else {
+      healthcheck.services.redis = 'DOWN';
+      healthcheck.status = 'DOWN';
+    }
+
+    const httpStatus = healthcheck.status === 'UP' ? 200 : 503;
+    res.status(httpStatus).json(healthcheck);
+  } catch (error) {
+    healthcheck.status = 'DOWN';
+    res.status(503).json(healthcheck);
+  }
 });
 
 // Rota Raiz

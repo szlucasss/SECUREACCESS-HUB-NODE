@@ -1,6 +1,7 @@
 import { Repository, EntityTarget, ObjectLiteral, DeepPartial } from 'typeorm';
 import { AppDataSource } from '../config/data-source';
 import { IRepository } from './interfaces/IRepository';
+import { PaginatedResult, PaginationOptions } from '../utils/Pagination';
 
 /**
  * Classe base abstrata que implementa os métodos genéricos do repositório.
@@ -32,10 +33,32 @@ export class BaseRepository<T extends ObjectLiteral> implements IRepository<T> {
   }
 
   /**
-   * Retorna todas as entidades da tabela.
+   * Retorna todas as entidades da tabela, com suporte opcional a paginação.
    */
-  async findAll(): Promise<T[]> {
-    return await this.repository.find();
+  async findAll(options?: PaginationOptions): Promise<PaginatedResult<T> | T[]> {
+    if (options) {
+      const { page, limit } = options;
+      const skip = (page - 1) * limit;
+
+      const [data, total] = await this.repository.findAndCount({
+        skip,
+        take: limit,
+        order: { createdAt: 'DESC' } as any, // Otimização: Ordena por data de criação (mais recentes primeiro)
+        // select: [] // TODO: Adicionar campos específicos se necessário para reduzir payload
+      });
+
+      return {
+        data,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      };
+    }
+
+    return await this.repository.find({
+      order: { createdAt: 'DESC' } as any,
+    });
   }
 
   /**
