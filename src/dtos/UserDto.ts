@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, IsOptional, IsUUID } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -30,6 +30,7 @@ export class UserResponseDto {
   name: string;
   createdAt: Date;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(user: any) {
     this.id = user.id;
     this.email = user.email;

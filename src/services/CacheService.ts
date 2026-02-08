@@ -16,6 +16,7 @@ export class CacheService {
    * @param value Valor a ser salvo
    * @param ttl Tempo de vida em segundos (padrão: 1 hora)
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async set(key: string, value: any, ttl: number = 3600): Promise<void> {
     await redis.set(key, JSON.stringify(value), 'EX', ttl);
   }

@@ -28,7 +28,7 @@ export class BaseRepository<T extends ObjectLiteral> implements IRepository<T> {
    * @param id ID da entidade
    */
   async findById(id: string): Promise<T | null> {
-    // @ts-ignore: TypeORM typings can be tricky with generic findOneBy
+    // @ts-expect-error: TypeORM typings can be tricky with generic findOneBy
     return await this.repository.findOneBy({ id });
   }
 
@@ -43,6 +43,7 @@ export class BaseRepository<T extends ObjectLiteral> implements IRepository<T> {
       const [data, total] = await this.repository.findAndCount({
         skip,
         take: limit,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         order: { createdAt: 'DESC' } as any, // Otimização: Ordena por data de criação (mais recentes primeiro)
         // select: [] // TODO: Adicionar campos específicos se necessário para reduzir payload
       });
@@ -57,6 +58,7 @@ export class BaseRepository<T extends ObjectLiteral> implements IRepository<T> {
     }
 
     return await this.repository.find({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       order: { createdAt: 'DESC' } as any,
     });
   }
@@ -67,6 +69,7 @@ export class BaseRepository<T extends ObjectLiteral> implements IRepository<T> {
    * @param data Dados a serem atualizados
    */
   async update(id: string, data: DeepPartial<T>): Promise<T | null> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await this.repository.update(id, data as any);
     return this.findById(id);
   }

@@ -66,7 +66,7 @@ app.get('/health', async (req: Request, res: Response) => {
 
     const httpStatus = healthcheck.status === 'UP' ? 200 : 503;
     res.status(httpStatus).json(healthcheck);
-  } catch (error) {
+  } catch (_error) {
     healthcheck.status = 'DOWN';
     res.status(503).json(healthcheck);
   }
@@ -95,4 +95,7 @@ app.get('/secure/admin', authMiddleware, checkRole(['ADMIN']), (req: Request, re
 // Inicialização do Servidor
 app.listen(port, () => {
   console.log(`[servidor]: Servidor rodando em http://localhost:${port}`);
+})
+.on('error', (_error) => {  
+  console.error('Erro ao iniciar servidor');
 });

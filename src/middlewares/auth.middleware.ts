@@ -20,8 +20,10 @@ function getKey(header: JwtHeader, callback: SigningKeyCallback) {
 
 // Extensão da interface Request para incluir o usuário
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       user?: any;
     }
   }
