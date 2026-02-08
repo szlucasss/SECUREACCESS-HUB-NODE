@@ -14,8 +14,8 @@ router.use(authMiddleware);
 
 // Apenas ADMIN pode criar, atualizar ou deletar usuários
 router.post('/', checkRole(['ADMIN']), validationMiddleware(CreateUserDto), userController.create);
-router.get('/', checkRole(['ADMIN']), userController.findAll);
-router.get('/:id', checkRole(['ADMIN', 'USER']), userController.findById); // USER pode ver detalhes (idealmente apenas o próprio)
+router.get('/', checkRole(['ADMIN', 'USER', 'AUDITOR']), userController.findAll); // Todos podem listar
+router.get('/:id', checkRole(['ADMIN', 'USER', 'AUDITOR']), userController.findById);
 router.put('/:id', checkRole(['ADMIN']), validationMiddleware(UpdateUserDto, true), userController.update);
 router.delete('/:id', checkRole(['ADMIN']), userController.delete);
 
